@@ -28,17 +28,16 @@ end IR_sender;
 
 Architecture behavioural of IR_sender is
 constant IR_carrier_delay      : INTEGER := 100000000/38000/2;--38kHz 
-constant IR_startBit_delay 	: INTEGER := 3*100000000/1000;--L‰ngden pÂ startbiten
-constant IR_high_delay 		: INTEGER := 2*100000000/1000;--L‰ngden pÂ en etta
-constant IR_low_delay 		: INTEGER := 1*100000000/1000;--L‰ngden pÂ en nolla
-constant IR_paus_delay 		: INTEGER := 1*100000000/1000;--L‰ngden pÂ pausen mellan bitarna
---constant IR_packet : UNSIGNED(7 downto 0) := "00101010"; --Spelar id
+constant IR_startBit_delay 	: INTEGER := 3*100000000/1000;--L√§ngden p√• startbiten
+constant IR_high_delay 		: INTEGER := 2*100000000/1000;--L√§ngden p√• en etta
+constant IR_low_delay 		: INTEGER := 1*100000000/1000;--L√§ngden p√• en nolla
+constant IR_paus_delay 		: INTEGER := 1*100000000/1000;--L√§ngden p√• pausen mellan bitarna
 signal IR_packet : UNSIGNED(7 downto 0) := "00000000"; --Spelar id
 
-signal Death : STD_LOGIC := '0';--ƒr 1 vid tr‰ff och Âterst‰lls efter Tr‰ffdelay
+signal Death : STD_LOGIC := '0';--√Ñr 1 vid tr√§ff och √•terst√§lls efter Tr√§ffdelay
 signal SpeakerOutshot : STD_LOGIC; -- Speaker
 signal SpeakerOutdmg : STD_LOGIC; --Speaker
-signal KillList : STD_LOGIC_VECTOR(63 downto 0);--Lagring fˆr tr‰ffar
+signal KillList : STD_LOGIC_VECTOR(63 downto 0);--Lagring f√∂r tr√§ffar
 
 signal UART_clock : STD_LOGIC := '0'; --debug;
 
@@ -123,7 +122,7 @@ variable reciever_state : INTEGER := -1;
 variable Index : INTEGER := 0;
 
 variable deathcounter : INTEGER := 0;
-variable deathThreshold : INTEGER := 1000000000; -- Death=1 i 30*100 000 000 klockcykler, alltsÂ 30sekunder.
+variable deathThreshold : INTEGER := 1000000000; -- Death=1 i 30*100 000 000 klockcykler, allts√• 30sekunder.
 variable dekad: Integer := 0;
 variable dekadThreshold : Integer := 0;
 
@@ -139,7 +138,7 @@ if rising_edge(CLK100MHZ) then
 
 
 	if Death > '0' then
-		if dekad = dekadThreshold then -- N‰r dekad =3 har 30s gÂtt.
+		if dekad = dekadThreshold then -- N√§r dekad =3 har 30s g√•tt.
 			Death <= '0';
 		end if;	
 		if deathcounter > deathThreshold then
@@ -153,12 +152,12 @@ if rising_edge(CLK100MHZ) then
 	if Reciever1 = '0' OR Reciever2 = '0'  then 
 		reciever_counter := reciever_counter +1;
 
-	elsif reciever_counter > reciever_LowNull_count then -- fˆrhindra noll count loop
+	elsif reciever_counter > reciever_LowNull_count then -- f√∂rhindra noll count loop
 
 		if reciever_counter > reciever_startbitHigh_count then -- startbit funnen!
 			reciever_state := 0;
 			reciever_counter := 0;
-		elsif reciever_state > -1 then -- kollar korrekt state fˆr data
+		elsif reciever_state > -1 then -- kollar korrekt state f√∂r data
 
 			if reciever_counter > reciever_highLow_count then -- 1:a funnen
 				reciever_temp_packet(reciever_state) := '1';
@@ -169,13 +168,13 @@ if rising_edge(CLK100MHZ) then
 			end if;
 
 			reciever_state := reciever_state +1;
-			if reciever_state > 7 then -- om all data ‰r funnen, gÂ tillbaka
+			if reciever_state > 7 then -- om all data √§r funnen, g√• tillbaka
 				reciever_packet := reciever_temp_packet;
 				reciever_state := -1; 
 				if reciever_packet(3)/=IR_packet(3) AND Death='0' AND reciever_packet < 16 then
-				    Death <= '1'; -- du dˆr :'-(
+				    Death <= '1'; -- du d√∂r :'-(
 				    dekad := 0;
-				    -- Killist (64 bitar) lagrar info om tr‰ffar (8 bitar per motstÂndare och 8 motstÂndare). 
+				    -- Killist (64 bitar) lagrar info om tr√§ffar (8 bitar per motst√•ndare och 8 motst√•ndare). 
                     Index := 8*to_integer(reciever_packet(2 downto 0)); 
                     if HIT='0' then
                         if killList(Index +3 downto Index) < "1001" then
@@ -192,12 +191,11 @@ if rising_edge(CLK100MHZ) then
                             killList(Index +3 downto Index) <= "0000";
                         end if;
                     end if;
-                                        --killList(Index+7 downto Index) <= killList(Index+7 downto Index) + '1';
+                           
 				   
 			    end if;
 			end if;
 		end if;
-	--else 
 	   	 -- om icke-definerad puls funnen, reset och leta efter ny starbit;
 	end if;
 end if;
@@ -211,7 +209,6 @@ if rising_edge(CLK100MHZ) then
 	   HIT <= '0';
     elsif Reciever2 = '0' then
 	   HIT <= '1';
---else HIT <= '0';
     end if;
 
 end if;
@@ -224,21 +221,21 @@ ShotSound:process(CLK100MHZ)
 variable counter : UNSIGNED(17 downto 0) := "000000000000000000"; -- En 18-bitars counter
 variable clkdividersvep : INTEGER := 100000000/4000/2; --2kHz - signal
 variable clkdivider	  : INTEGER := 100000000/4000/2; --2kHz - signal
-variable SP : STD_LOGIC := '0';--Behˆvs dÂ vi inte kan anv‰nda outputen direkt, som ett mellansteg
+variable SP : STD_LOGIC := '0';--Beh√∂vs d√• vi inte kan anv√§nda outputen direkt, som ett mellansteg
 
 begin
 if rising_edge(CLK100MHZ) then
-    if BTNC='0' AND (clkdivider > 49999 OR clkdivider = clkdividersvep) then-- Som en reset, tryck pÂ BTNC sÂ lÂter hˆgtalaren. DÂ clkdivider nÂr 50000 ‰r signalen klar.
-	   counter := "000000000000000000"; -- Countern resetas och r‰knar ej.
+    if BTNC='0' AND (clkdivider > 49999 OR clkdivider = clkdividersvep) then-- Som en reset, tryck p√• BTNC s√• l√•ter h√∂gtalaren. D√• clkdivider n√•r 50000 √§r signalen klar.
+	   counter := "000000000000000000"; -- Countern resetas och r√§knar ej.
 	   clkdivider := clkdividersvep;
 	   SP := '0';
     else
-	   if to_integer(counter) = clkdivider then -- N‰r r‰knaren nÂr clkdivider sÂ switchas SP och countern nollst‰lls.
-		  SP := NOT SP;-- SP byter tecken vilket i sin tur kommer byta tecken pÂ utsignalen till Port1.
+	   if to_integer(counter) = clkdivider then -- N√§r r√§knaren n√•r clkdivider s√• switchas SP och countern nollst√§lls.
+		  SP := NOT SP;-- SP byter tecken vilket i sin tur kommer byta tecken p√• utsignalen till Port1.
 		  
 		  counter := "000000000000000000";
 		  clkdivider := clkdivider + 100;
-	   elsif clkdivider < 50000 then -- countern r‰knar sÂ l‰nge clkdivider ‰r mindre ‰n 50000
+	   elsif clkdivider < 50000 then -- countern r√§knar s√• l√§nge clkdivider √§r mindre √§n 50000
 	       counter := counter + 1;
 	   else
 	       counter := "000000000000000000";
@@ -256,15 +253,15 @@ variable clkdividerdmg : INTEGER := 100000000/200/2;
 
 begin
 if rising_edge(CLK100MHZ) then
-	if Death='0' AND (percountD > 150 OR percountD = 0) then--N‰r death ‰ndras kˆrs ljudet
-		counterD := "000000000000000000"; -- Countern resetas och r‰knar ej.
+	if Death='0' AND (percountD > 150 OR percountD = 0) then--N√§r death √§ndras k√∂rs ljudet
+		counterD := "000000000000000000"; -- Countern resetas och r√§knar ej.
 		SPD := '0';
 		percountD := 0;
 
 	else
-		if to_integer(counterD) = clkdividerdmg then -- N‰r r‰knaren nÂr clkdividerdmg sÂ switchas SPD och countern nollst‰lls.
-			if percountD < 50 OR (percountD > 100 AND percountD < 150) then -- Skickar ut tvÂ ljudpulser (ljud 0-50, paus 50-100, ljud 100-150)
-			SPD := NOT SPD;-- SPD byter tecken vilket i sin tur kommer byta tecken pÂ utsignalen till Port1.
+		if to_integer(counterD) = clkdividerdmg then -- N√§r r√§knaren n√•r clkdividerdmg s√• switchas SPD och countern nollst√§lls.
+			if percountD < 50 OR (percountD > 100 AND percountD < 150) then -- Skickar ut tv√• ljudpulser (ljud 0-50, paus 50-100, ljud 100-150)
+			SPD := NOT SPD;-- SPD byter tecken vilket i sin tur kommer byta tecken p√• utsignalen till Port1.
 			
 			end if;
 			counterD := "000000000000000000";
@@ -273,7 +270,7 @@ if rising_edge(CLK100MHZ) then
 			counterD := counterD + 1;
 		end if; 
 	end if;
-	SpeakerOutdmg <= SPD; -- SP/SPD matas in pÂ utsignalen
+	SpeakerOutdmg <= SPD; -- SP/SPD matas in p√• utsignalen
 end if;
 
 end process;
@@ -308,30 +305,25 @@ begin
 if rising_edge (CLK100MHZ) then
 
 	if Death = '0' then
---		if HIT='0' then
---        		dig2 <= "011";
---		elsif HIT='1' then
---			dig2="110";
---		end if;
         dig1 <= "0000";
         count := "000000000000000000000000000";
 	k := 1;
 
         	IR_packet(3 downto 0) <= player; 
 
-		pcount := pcount + 1; -- count r‰knar upp
+		pcount := pcount + 1; -- count r√§knar upp
 
-		if pcount = "11111111111111" then -- resetar n‰r count nÂr 16383
+		if pcount = "11111111111111" then -- resetar n√§r count n√•r 16383
 		pcount := "00000000000000";
-		elsif pcount < "01010101010101" then -- position 0 fˆr count: 0-5461 (fˆrsta siffran/bokstaven lyser)
+		elsif pcount < "01010101010101" then -- position 0 f√∂r count: 0-5461 (f√∂rsta siffran/bokstaven lyser)
 		position := 0;
-		elsif (pcount > "10101010101010" OR pcount = "10101010101010") AND pcount < "11111111111111" then -- position 1 fˆr count: 10922-16383 (andra siffran/bokstaven lyser)
+		elsif (pcount > "10101010101010" OR pcount = "10101010101010") AND pcount < "11111111111111" then -- position 1 f√∂r count: 10922-16383 (andra siffran/bokstaven lyser)
 		position := 1;
-		else -- position 2 fˆr count: 5462-10921 (tredje siffran/bokstaven lyser)
+		else -- position 2 f√∂r count: 5462-10921 (tredje siffran/bokstaven lyser)
 		position := 2;
 		end if; -- count
 
-		if BTNU = '1' then -- n‰r BTNU trycks ned sÂ ˆkar player med ett.
+		if BTNU = '1' then -- n√§r BTNU trycks ned s√• √∂kar player med ett.
 			if clickU = '1' then
 				player := player + 1;
 				clickU := '0';
@@ -340,7 +332,7 @@ if rising_edge (CLK100MHZ) then
 		else
 			clickU := '1';
 		end if; --BTNU
-		if BTND = '1' then -- n‰r BTND trycks ned sÂ minskar player med ett.
+		if BTND = '1' then -- n√§r BTND trycks ned s√• minskar player med ett.
 			if clickD = '1' then
 				player := player - 1;
 				clickD := '0';
@@ -420,19 +412,19 @@ if rising_edge (CLK100MHZ) then
 				end if;
 			end if;
 	
-			if count2 = "11111111111111" then -- resetar n‰r count2 nÂr 16383
+			if count2 = "11111111111111" then -- resetar n√§r count2 n√•r 16383
 				count2 := "00000000000000";
-			elsif count2 < "00101010101010" OR count2 = "00101010101010" then -- position 0 fˆr count2, fˆrsta siffran lyser
+			elsif count2 < "00101010101010" OR count2 = "00101010101010" then -- position 0 f√∂r count2, f√∂rsta siffran lyser
 				position := 0;
-			elsif (count2 < "01010101010100" AND count2 > "00101010101010") OR  count2 = "00101010101010" then -- position 1 fˆr count2, andra siffran lyser
+			elsif (count2 < "01010101010100" AND count2 > "00101010101010") OR  count2 = "00101010101010" then -- position 1 f√∂r count2, andra siffran lyser
 				position := 1;
-			elsif (count2 < "01111111111110" AND count2 > "01010101010100") OR count2 = "01010101010100" then -- position 2 fˆr count2, tredje siffran lyser
+			elsif (count2 < "01111111111110" AND count2 > "01010101010100") OR count2 = "01010101010100" then -- position 2 f√∂r count2, tredje siffran lyser
 				position := 2;
-			elsif (count2 < "10101010101000" AND count2 > "01111111111110") OR count2 = "01111111111110" then -- position 3 fˆr count2, fj‰rde siffran lyser
+			elsif (count2 < "10101010101000" AND count2 > "01111111111110") OR count2 = "01111111111110" then -- position 3 f√∂r count2, fj√§rde siffran lyser
 				position := 3;
-			elsif (count2 < "11010101010010" AND count2 > "10101010101000") OR count2 = "10101010101000" then -- position 4 fˆr count2, femte siffran lyser
+			elsif (count2 < "11010101010010" AND count2 > "10101010101000") OR count2 = "10101010101000" then -- position 4 f√∂r count2, femte siffran lyser
 				position := 4;
-			else    											  -- position 5 fˆr count2, sj‰tte siffran lyser
+			else    											  -- position 5 f√∂r count2, sj√§tte siffran lyser
             			position := 5;
 			end if;
 
@@ -479,10 +471,10 @@ end if; -- klocka
 
 end process;
 
-UART:process(CLK100MHZ)--÷verfˆring av killist till Dator
+UART:process(CLK100MHZ)--√ñverf√∂ring av killist till Dator
 constant UART_delay : INTEGER := 100000000/9600; --9600Hz baud
 variable UART_counter : INTEGER := 0;
-variable Send_UART : STD_LOGIC := '0';--Flagga fˆr att styra sÂ vi bara skickar informationen en gÂng 
+variable Send_UART : STD_LOGIC := '0';--Flagga f√∂r att styra s√• vi bara skickar informationen en g√•ng 
 variable UART_state : INTEGER := 0; --state machine;
 variable UART_bit : STD_LOGIC := '1';--
 variable UART_ListIndex : INTEGER := 0;
@@ -494,9 +486,9 @@ begin
 	if CPU_RESETN = '0' then
 	   UART_counter := 0;
 	   UART_state := 0;
-       UART_bit := '1';
-       UART_ListIndex := 0;
-       Send_UART := '0';
+           UART_bit := '1';
+           UART_ListIndex := 0;
+           Send_UART := '0';
 	
 	
 	elsif(rising_edge(CLK100MHZ)) then
@@ -557,7 +549,7 @@ begin
 			when 31 => UART_bit := '1'; --stopbit
             
             when 32 => UART_bit := '1'; --stopbit
-            --Bˆrja om l‰ngst till v‰nster pÂ ny rad i putty
+            --B√∂rja om l√§ngst till v√§nster p√• ny rad i putty
             when 33 => UART_bit := '0'; --start bit
             when 34 => UART_bit := '1'; --1
             when 35 => UART_bit := '0'; --0
@@ -570,7 +562,7 @@ begin
             when 42 => UART_bit := '1'; --stopbit
             when 43 => UART_bit := '1'; --stopbit
             
-			when others => -- transmission complete, reset to known state;
+		when others => -- transmission complete, reset to known state;
 					if UART_ListIndex < 7 then
 						UART_ListIndex := UART_ListIndex +1;
 						UART_state := 0;
